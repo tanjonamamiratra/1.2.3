@@ -118,7 +118,7 @@ private fun PreviewCard(vm: BibleViewModel) {
 @Composable
 fun ThemeCard(vm: BibleViewModel) {
     SettingBlock("Endrika") {
-        Segmented(listOf("Araka ny finday", "Mazava", "Maizina"), vm.theme, { vm.setTheme(it) })
+        Segmented(listOf("Araka ny finday", "Mazava", "Maizina"), vm.theme, { vm.updateTheme(it) })
     }
 }
 
@@ -131,7 +131,7 @@ private fun AccentCard(vm: BibleViewModel) {
                 val on = vm.accent == i
                 Box44(
                     selected = on,
-                    onClick = { vm.setAccent(i) },
+                    onClick = { vm.updateAccent(i) },
                     brush = Brush.linearGradient(listOf(a.lightHero[0], a.lightHero[2])),
                     ring = if (on) cs.primary else cs.outlineVariant,
                 )
@@ -161,7 +161,7 @@ private fun BackgroundCard(vm: BibleViewModel) {
                 val on = vm.bgStyle == i
                 val shape = RoundedCornerShape(12.dp)
                 Column(
-                    Modifier.weight(1f).clickable { vm.setBgStyle(i) },
+                    Modifier.weight(1f).clickable { vm.updateBgStyle(i) },
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     androidx.compose.foundation.layout.Box(
@@ -183,27 +183,27 @@ private fun BackgroundCard(vm: BibleViewModel) {
 @Composable
 fun FontCard(vm: BibleViewModel) {
     SettingBlock("Haben’ny soratra : ${vm.fontSize.toInt()}") {
-        Slider(value = vm.fontSize, onValueChange = { vm.setFontSize(it) }, valueRange = 14f..30f)
+        Slider(value = vm.fontSize, onValueChange = { vm.updateFontSize(it) }, valueRange = 14f..30f)
     }
 }
 
 @Composable
 fun FamilyCard(vm: BibleViewModel) {
     SettingBlock("Karazana soratra") {
-        Segmented(listOf("Serif", "Sans"), if (vm.sansFont) 1 else 0, { vm.setSansFont(it == 1) })
+        Segmented(listOf("Serif", "Sans"), if (vm.sansFont) 1 else 0, { vm.updateSansFont(it == 1) })
     }
 }
 
 @Composable
 private fun SpacingCard(vm: BibleViewModel) {
     SettingBlock("Elanelana ny andalana") {
-        Segmented(listOf("Antonony", "Lehibe"), if (vm.largeSpacing) 1 else 0, { vm.setLargeSpacing(it == 1) })
+        Segmented(listOf("Antonony", "Lehibe"), if (vm.largeSpacing) 1 else 0, { vm.updateLargeSpacing(it == 1) })
     }
 }
 
 @Composable
 private fun AlignCard(vm: BibleViewModel) {
     SettingBlock("Fandrafetana") {
-        Segmented(listOf("Havia", "Mitovy"), if (vm.justify) 1 else 0, { vm.setJustify(it == 1) })
+        Segmented(listOf("Havia", "Mitovy"), if (vm.justify) 1 else 0, { vm.updateJustify(it == 1) })
     }
 }
