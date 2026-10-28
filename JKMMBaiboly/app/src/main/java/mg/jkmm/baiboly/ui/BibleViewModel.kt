@@ -85,13 +85,13 @@ class BibleViewModel(app: Application) : AndroidViewModel(app) {
         return null
     }
 
-    fun setFontSize(v: Float) { fontSize = v; prefs.fontSize = v }
-    fun setTheme(v: Int) { theme = v; prefs.theme = v }
-    fun setAccent(v: Int) { accent = v; prefs.accent = v }
-    fun setBgStyle(v: Int) { bgStyle = v; prefs.bgStyle = v }
-    fun setSansFont(v: Boolean) { sansFont = v; prefs.sansFont = v }
-    fun setLargeSpacing(v: Boolean) { largeSpacing = v; prefs.largeSpacing = v }
-    fun setJustify(v: Boolean) { justify = v; prefs.justify = v }
+    fun updateFontSize(v: Float) { fontSize = v; prefs.fontSize = v }
+    fun updateTheme(v: Int) { theme = v; prefs.theme = v }
+    fun updateAccent(v: Int) { accent = v; prefs.accent = v }
+    fun updateBgStyle(v: Int) { bgStyle = v; prefs.bgStyle = v }
+    fun updateSansFont(v: Boolean) { sansFont = v; prefs.sansFont = v }
+    fun updateLargeSpacing(v: Boolean) { largeSpacing = v; prefs.largeSpacing = v }
+    fun updateJustify(v: Boolean) { justify = v; prefs.justify = v }
 
     /** Ajoute un passage en tête de l'historique (sans doublon, 8 maximum). from = 0 : chapitre entier. */
     fun addHistory(book: Int, chapter: Int, from: Int = 0, to: Int = 0) {
