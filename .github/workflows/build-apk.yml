@@ -54,6 +54,16 @@ jobs:
         with:
           gradle-version: 8.9
 
+      - name: Vérifier que la signature est bien configurée
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if ! grep -q "hasSigningKey" app/build.gradle.kts; then
+            echo "ERREUR : le fichier app/build.gradle.kts du dépôt n'est pas la dernière version (il n'a pas la partie signature)."
+            echo "Renvoyez le fichier app/build.gradle.kts du dernier JKMMBaiboly.zip dans le dossier app du dépôt."
+            exit 1
+          fi
+          ls -la signing || true
+
       - name: Compiler l'APK signé
         working-directory: ${{ env.PROJECT_DIR }}
         run: gradle assembleRelease --no-daemon
@@ -61,9 +71,22 @@ jobs:
       - name: Nommer l'APK
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts || echo "inconnue")
           mkdir -p sortie
-          cp app/build/outputs/apk/release/app-release.apk "sortie/Baiboly-JKMM-$VERSION.apk"
+          APK=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
+          if [ -z "$APK" ]; then
+            echo "ERREUR : aucun APK n'a été créé. Fichiers trouvés dans app/build/outputs :"
+            find app/build/outputs -maxdepth 4 | head -40
+            exit 1
+          fi
+          echo "APK trouvé : $APK"
+          case "$APK" in
+            *unsigned*) echo "ATTENTION : cet APK n'est pas signé et ne s'installera pas."; exit 1 ;;
+          esac
+          cp "$APK" "sortie/Baiboly-JKMM-$VERSION.apk"
+          # Affiche l'empreinte de la signature (pour vérifier que c'est toujours la même clé)
+          APKSIGNER="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)/apksigner"
+          "$APKSIGNER" verify --print-certs "sortie/Baiboly-JKMM-$VERSION.apk" || true
 
       - name: Publier l'APK
         uses: actions/upload-artifact@v4
