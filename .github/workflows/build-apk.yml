@@ -1,0 +1,37 @@
+
+name: Build JKMM Baiboly APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Find Android project
+        run: |
+          find . -maxdepth 4 \( -name gradlew -o -name gradlew.bat \) -print
+          find . -maxdepth 4 -name settings.gradle -o -name settings.gradle.kts
+
+      - name: Build APK
+        run: |
+          chmod +x JKMMBaiboly/gradlew
+          cd JKMMBaiboly
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Baiboly-JKMM-apk
+          path: JKMMBaiboly/**/build/outputs/apk/**/*.apk
+          if-no-files-found: error
