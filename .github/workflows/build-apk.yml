@@ -14,6 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Cherche le dossier qui contient settings.gradle.kts (à la racine ou dans un sous-dossier)
+      - name: Trouver le dossier du projet
+        run: |
+          SETTINGS=$(find . -maxdepth 3 -name settings.gradle.kts -not -path "./.git/*" | head -n 1)
+          if [ -z "$SETTINGS" ]; then
+            echo "ERREUR : settings.gradle.kts est introuvable. Le projet n'a pas été envoyé dans le dépôt."
+            echo "Contenu du dépôt :"; ls -la; exit 1
+          fi
+          echo "Projet trouvé dans : $(dirname "$SETTINGS")"
+          echo "PROJECT_DIR=$(dirname "$SETTINGS")" >> "$GITHUB_ENV"
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -22,6 +33,7 @@ jobs:
       # Créée UNE SEULE FOIS, puis réutilisée pour toutes les versions suivantes.
       # (Toutes les mises à jour doivent être signées avec la même clé.)
       - name: Créer la clé de signature si elle n'existe pas
+        working-directory: ${{ env.PROJECT_DIR }}
         run: |
           if [ ! -f signing/jkmm.jks ]; then
             mkdir -p signing
@@ -43,9 +55,11 @@ jobs:
           gradle-version: 8.9
 
       - name: Compiler l'APK signé
+        working-directory: ${{ env.PROJECT_DIR }}
         run: gradle assembleRelease --no-daemon
 
       - name: Nommer l'APK
+        working-directory: ${{ env.PROJECT_DIR }}
         run: |
           VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
           mkdir -p sortie
@@ -55,10 +69,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Baiboly-JKMM-apk
-          path: sortie/*.apk
+          path: ${{ env.PROJECT_DIR }}/sortie/*.apk
 
       - name: Sauvegarde de la clé (à télécharger et à garder en lieu sûr)
         uses: actions/upload-artifact@v4
         with:
           name: SAUVEGARDE-CLE-SECRETE
-          path: signing/
+          path: ${{ env.PROJECT_DIR }}/signing/
